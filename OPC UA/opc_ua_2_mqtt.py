@@ -1,27 +1,38 @@
+
+import os
 import math
 import time
 from opcua import Client
 import paho.mqtt.client as mqtt
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import boto3
 
-# --- OPC UA Settings ---
+# OPC UA 
 OPC_ENDPOINT = "opc.tcp://localhost:4840/ua/metrics"
 NAMESPACE_URI = "urn:example:opcua:metrics"
 
-# --- MQTT Settings (AWS IoT) ---
+# MQTT Settings (AWS IoT) 
 MQTT_BROKER = "aky0hohdi2yni-ats.iot.us-east-1.amazonaws.com"
 MQTT_PORT = 8883
 MQTT_TOPIC = "opcua/metrics"
 DEVICE_ID = "laptop-core-01"
 
-# --- WebSocket Broker for React Dashboard ---
-WS_BROKER = "test.mosquitto.org"  # hostname only
+# WebSocket Broker 
+WS_BROKER = "test.mosquitto.org" 
 WS_PORT = 8081
 WS_TOPIC = MQTT_TOPIC
 
+# S3 Settings
+S3_BUCKET = "harsh03bucket"
+
+# Make sure to run:  setx AWS_PROFILE opcua-logger  (Windows)
+session = boto3.Session(profile_name="opcua-logger", region_name="us-east-1")
+s3_client = session.client("s3")
+
+
 def connect_opcua():
+    """Connect to OPC UA server."""
     while True:
         try:
             client = Client(OPC_ENDPOINT)
@@ -32,7 +43,9 @@ def connect_opcua():
             print(f"❌ OPC UA connect failed: {e}, retrying in 5s...")
             time.sleep(5)
 
+
 def connect_mqtt():
+    """Connect to AWS IoT Core via MQTT."""
     while True:
         try:
             client = mqtt.Client(client_id="opcua_publisher")
@@ -55,7 +68,9 @@ def connect_mqtt():
             print(f"❌ MQTT connect failed: {e}, retrying in 5s...")
             time.sleep(5)
 
+
 def connect_mqtt_ws():
+    """Connect to WebSocket broker for React dashboard."""
     while True:
         try:
             client = mqtt.Client(client_id="opcua_ws_publisher", transport="websockets")
@@ -74,14 +89,17 @@ def connect_mqtt_ws():
             print(f"❌ WS connect failed: {e}, retrying in 5s...")
             time.sleep(5)
 
+
 def save_to_s3(payload):
+    """Save JSON logs to S3 bucket, organized per device."""
     try:
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
-        s3_key = f"logs/{timestamp}.json"
+        ts = datetime.now(timezone.utc).strftime("%Y-%m-%d/%H/%M/%S-%f")
+        s3_key = f"logs/{DEVICE_ID}/{ts}.json"
         s3_client.put_object(Bucket=S3_BUCKET, Key=s3_key, Body=json.dumps(payload, indent=2))
         print(f"✅ Log saved to S3: {s3_key}")
     except Exception as e:
         print(f"⚠️ Failed to save log to S3: {e}")
+
 
 def main():
     client = connect_opcua()
@@ -120,11 +138,15 @@ def main():
 
                 payload = {"device_id": DEVICE_ID, "timestamp": int(time.time() * 1000), **values}
 
+                # Publish to MQTT (AWS IoT Core)
                 mqtt_client.publish(MQTT_TOPIC, json.dumps(payload, indent=2))
+
+                # Publish to WebSocket
                 mqtt_ws_client.publish(WS_TOPIC, json.dumps(payload))
-                print("📤 Published payload to AWS + WS:", payload)
 
                 save_to_s3(payload)
+
+                print("📤 Published payload to AWS + WS:", payload)
             except Exception as e:
                 print(f"⚠️ Error in main loop: {e}")
                 time.sleep(2)
@@ -138,6 +160,6 @@ def main():
         mqtt_client.disconnect()
         mqtt_ws_client.disconnect()
 
+
 if __name__ == "__main__":
     main()
-
