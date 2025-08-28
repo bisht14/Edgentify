@@ -1,3 +1,20 @@
+
+#!/usr/bin/env python3
+"""
+OPC UA Metrics Server
+
+Exposes system metrics (CPU, memory, disk, network, uptime, load avg) as OPC UA variables.
+Tested with python-opcua >= 1.3.3 and psutil >= 5.9.
+
+Run:
+  python opcua_metrics_server.py --endpoint opc.tcp://0.0.0.0:4840/ua/metrics --name LaptopMetricsServer --interval 5
+
+Browse path (QualifiedName):
+  Objects → <ns=your_idx>:SystemMetrics → variables
+
+Security: by default runs without encryption for local testing. See the
+`enable_security()` function for how to add basic encryption & auth.
+"""
 from __future__ import annotations
 
 import argparse
@@ -71,7 +88,6 @@ class MetricsServer:
         self.server = server
         self.idx = idx
 
-
     def enable_security(self, cert_path: str, key_path: str, username: Optional[str] = None, password: Optional[str] = None) -> None:
         """Optional: enable basic security. Provide paths to PEM certificate and private key.
         To enforce username/password, pass both username and password.
@@ -100,7 +116,6 @@ class MetricsServer:
 
             self.server.user_manager.set_user_manager(UserManager(username, password).get_user)
 
-    
     def _collect_metrics(self) -> dict:
         # CPU and memory
         cpu_percent = psutil.cpu_percent(interval=None)
@@ -165,40 +180,12 @@ class MetricsServer:
             "temp_c": temp_c,
         }
 
-    # def start(self) -> None:
-    #     assert self.server is not None
-    #     self.server.start()
-    #     print(f"OPC UA Metrics Server started: {self.endpoint}")
-    #     print(f"Namespace: {self.namespace_uri}")
-    #     print("Press Ctrl+C to stop.")
-
-    #     running = True
-
-    #     def handle_stop(signum, frame):
-    #         nonlocal running
-    #         print("\nStopping...")
-    #         running = False
-
-    #     signal.signal(signal.SIGINT, handle_stop)
-    #     signal.signal(signal.SIGTERM, handle_stop)
-
-    #     try:
-    #         while running:
-    #             data = self._collect_metrics()
-    #             # Update variables
-    #             for key, value in data.items():
-    #                 self.vars[key].set_value(value)
-    #             time.sleep(self.update_interval)
-    #     finally:
-    #         self.server.stop()
-    #         print("Server stopped.")
-
     def start(self) -> None:
         assert self.server is not None
         self.server.start()
         print(f"OPC UA Metrics Server started: {self.endpoint}")
         print(f"Namespace: {self.namespace_uri}")
-        print("Press Ctrl+C to stop.\n")
+        print("Press Ctrl+C to stop.")
 
         running = True
 
@@ -213,19 +200,13 @@ class MetricsServer:
         try:
             while running:
                 data = self._collect_metrics()
-
-            # Update OPC UA variables
-            for key, value in data.items():
-                self.vars[key].set_value(value)
-
-            # Print CPU & Memory utilisation to terminal
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] CPU: {data['cpu_percent']}% | Memory: {data['mem_percent']}%")
-
-            time.sleep(self.update_interval)
+                # Update variables
+                for key, value in data.items():
+                    self.vars[key].set_value(value)
+                time.sleep(self.update_interval)
         finally:
             self.server.stop()
             print("Server stopped.")
-
 
 
 def parse_args() -> argparse.Namespace:
