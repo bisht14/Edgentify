@@ -10,8 +10,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import EdgeDevices from "./pages/EdgeDevices";
 import NotFound from "./pages/NotFound";
-import MqttDashboard from "./pages/MqttDashboard"; // Import your MQTT dashboard
-// import TriggerMqtt from "./pages/TriggerMqtt";
+import MqttDashboard from "./pages/MqttDashboard"; 
 
 const queryClient = new QueryClient();
 
@@ -53,3 +52,4 @@ const App = () => {
 };
 
 export default App;
+
