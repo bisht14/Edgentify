@@ -77,7 +77,7 @@ const MergedMqttDashboard = () => {
           <p>
             <strong>Disk %:</strong> {latest.disk_percent_root}
           </p>
-          {/* Optional extra fields */}
+          
           {Object.keys(latest).map((key) => {
             if (
               !["timestamp", "cpu_percent", "mem_percent", "disk_percent_root"].includes(
@@ -95,7 +95,7 @@ const MergedMqttDashboard = () => {
         </div>
       )}
 
-      {/* Raw JSON Messages */}
+      
       <div className="bg-gray-100 p-4 rounded h-96 overflow-auto font-mono text-sm">
         {messages.length > 0 ? (
           messages.map((msg, idx) => <div key={idx}>{msg}</div>)
@@ -108,4 +108,5 @@ const MergedMqttDashboard = () => {
 };
 
 export default MergedMqttDashboard;
+
 
