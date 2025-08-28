@@ -1,24 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { Header } from "@/components/Header";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import { HealthChart } from "@/components/HealthChart";
-// import { supabase } from "@/integrations/supabase/client";
-// import { 
-//   RefreshCw, 
-//   Server, 
-//   AlertTriangle, 
-//   CheckCircle,
-//   TrendingUp,
-//   Activity,
-//   Database
-// } from "lucide-react";
-// import { formatDistanceToNow } from "date-fns";
-
-
-
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -151,3 +130,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
