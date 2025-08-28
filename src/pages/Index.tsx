@@ -60,26 +60,6 @@ const devicesData = [
     lastSeen: "30 seconds ago",
     location: "Building B - Server Room"
   },
-  // {
-  //   id: "IOT-003",
-  //   name: "Vibration Monitor C1",
-  //   type: "Industrial Sensor",
-  //   status: "offline" as const,
-  //   battery: 0,
-  //   signalStrength: 0,
-  //   lastSeen: "5 minutes ago",
-  //   location: "Factory Floor - Machine #7"
-  // },
-  // {
-  //   id: "IOT-004",
-  //   name: "Air Quality Sensor D1",
-  //   type: "Environmental Sensor",
-  //   status: "offline" as const,
-  //   battery: 0,
-  //   signalStrength: 0,
-  //   lastSeen: "2 hours ago",
-  //   location: "Building D - HVAC Room"
-  // }
 ];
 
 const uptimeData = [
@@ -232,5 +212,6 @@ const Index = () => {
     </div>
   );
 };
+
 
 export default Index;
