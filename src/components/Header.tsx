@@ -55,16 +55,27 @@ export const Header = () => {
               </Button>
             </Link>
             
-            {/* <Link to="/devices">
+            <Link to="/devices">
               <Button 
                 variant={isActive("/devices") ? "default" : "ghost"} 
                 size="sm"
                 className="flex items-center space-x-2"
               >
                 <Activity className="h-4 w-4" />
-                <span>Devices</span>
+                <span>S3 Logs</span>
               </Button>
-            </Link> */}
+              </Link>
+
+              <Link to="/mqtt">
+                <Button 
+                  variant={isActive("/mqtt") ? "default" : "ghost"} 
+                  size="sm"
+                  className="flex items-center space-x-2"
+                >
+                  <Activity className="h-4 w-4" />
+                  <span>Trigger MQTT</span>
+              </Button>
+            </Link>
           </nav>
         </div>
 
